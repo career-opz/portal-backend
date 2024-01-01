@@ -21,4 +21,8 @@ To install the project if you want
 ```
 
 Otherwise you can use intellij to run the portal backend
+## Documentation
+
+[swager-docs](http://localhost:9092/swagger-ui/index.html)
+
     
