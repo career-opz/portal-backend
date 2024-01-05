@@ -1,8 +1,6 @@
 package dev.careeropz.portal.backend.cvmanager.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.careeropz.portal.backend.config.ApplicationProperties;
 import dev.careeropz.portal.backend.cvmanager.dto.APIResponse;
 import dev.careeropz.portal.backend.cvmanager.dto.ResponseEnum;
@@ -15,16 +13,15 @@ import org.springframework.web.client.RestClientResponseException;
 
 import static dev.careeropz.portal.backend.cvmanager.controller.CvManagetUrlConstants.*;
 import static dev.careeropz.portal.backend.cvmanager.service.CommonFunctions.getErrorApiResponse;
+import static dev.careeropz.portal.backend.cvmanager.service.CommonFunctions.parseJson;
 
 @Service
 @Slf4j
-public class CvManagerProfileClientService {
+public class CvUserProfileService {
 
     private final RestClient restClient;
-    private final ApplicationProperties properties;
 
-    public CvManagerProfileClientService(ApplicationProperties properties) {
-        this.properties = properties;
+    public CvUserProfileService(ApplicationProperties properties) {
         restClient = RestClient.builder()
                 .baseUrl(UriBuilder
                         .builder()
@@ -225,10 +222,5 @@ public class CvManagerProfileClientService {
             log.error("Exception occurred while deactivating profile {} from CvManagerService, Exception message {}", userid, ex.getMessage());
             throw new CvManagerServiceException("Exception occurred while deactivating profile info in CvManagerService");
         }
-    }
-
-    private JsonNode parseJson(String jsonString) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readTree(jsonString);
     }
 }

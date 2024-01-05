@@ -1,5 +1,8 @@
 package dev.careeropz.portal.backend.cvmanager.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.careeropz.portal.backend.cvmanager.dto.APIResponse;
 import dev.careeropz.portal.backend.cvmanager.dto.ErrorDTO;
 import dev.careeropz.portal.backend.cvmanager.dto.ResponseEnum;
@@ -18,6 +21,11 @@ public class CommonFunctions {
                         .errorMessage(restEx.getMessage())
                         .build()))
                 .build();
+    }
+
+    public static JsonNode parseJson(String jsonString) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readTree(jsonString);
     }
 
 }
