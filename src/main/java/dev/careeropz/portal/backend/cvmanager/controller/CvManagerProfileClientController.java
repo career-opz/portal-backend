@@ -21,7 +21,7 @@ public class CvManagerProfileClientController {
 
     @Tag(name= "User Profile", description = "User profile related APIs")
     @GetMapping(USER_PROFILE + PARAM_USER_ID)
-    public ResponseEntity<APIResponse> getProfileInfo(@RequestHeader(name = "Authorization", required = false) String Authorization, @PathVariable String userid) {
+    public ResponseEntity<APIResponse> getProfileInfo(@RequestHeader(name = "Authorization", required = false) String authorization, @PathVariable String userid) {
 
         log.info("CvManagerProfileController::getProfileInfo userid {}", userid);
 
@@ -45,7 +45,7 @@ public class CvManagerProfileClientController {
 
     @Tag(name= "User Profile")
     @PutMapping(USER_PROFILE + PARAM_USER_ID)
-    public ResponseEntity<APIResponse> updateProfileInfo(@RequestHeader(name = "Authorization", required = false) String Authorization, @PathVariable String userid, @RequestBody String body) {
+    public ResponseEntity<APIResponse> updateProfileInfo(@RequestHeader(name = "Authorization", required = false) String authorization, @PathVariable String userid, @RequestBody String body) {
 
         log.info("CvManagerProfileController::updateProfileInfo user-id {}", userid);
         APIResponse apiResponse = cvUserProfileService.updateProfileById(userid, body);
@@ -57,7 +57,7 @@ public class CvManagerProfileClientController {
 
     @Tag(name= "Default Docs", description = "Default docs related APIs")
     @GetMapping(USER_PROFILE + PARAM_USER_ID + DEFAULT_DOCS)
-    public ResponseEntity<APIResponse> getDefaultDocs(@RequestHeader(name = "Authorization", required = false) String Authorization, @PathVariable String userid) {
+    public ResponseEntity<APIResponse> getDefaultDocs(@RequestHeader(name = "Authorization", required = false) String authorization, @PathVariable String userid) {
 
         log.info("CvManagerProfileController::getDefaultDocs user-id {}", userid);
         APIResponse apiResponse = cvUserProfileService.getDefaultDocs(userid);
@@ -69,7 +69,7 @@ public class CvManagerProfileClientController {
 
     @Tag(name= "Default Docs")
     @PutMapping(USER_PROFILE + PARAM_USER_ID + DEFAULT_DOCS)
-    public ResponseEntity<APIResponse> updateDefaultDocs(@RequestHeader(name = "Authorization", required = false) String Authorization, @PathVariable String userid, @RequestBody String body) {
+    public ResponseEntity<APIResponse> updateDefaultDocs(@RequestHeader(name = "Authorization", required = false) String authorization, @PathVariable String userid, @RequestBody String body) {
 
         log.info("CvManagerProfileController::updateDefaultDocs user-id {}", userid);
         APIResponse apiResponse = cvUserProfileService.updateDefaultDocs(userid, body);
@@ -81,7 +81,7 @@ public class CvManagerProfileClientController {
 
     @Tag(name= "Profile activation", description = "Profile activation related APIs")
     @PutMapping(USER_PROFILE + PARAM_USER_ID + ACTIVATE)
-    public ResponseEntity<APIResponse> activateProfile(@RequestHeader(name = "Authorization", required = false) String Authorization, @PathVariable String userid) {
+    public ResponseEntity<APIResponse> activateProfile(@RequestHeader(name = "Authorization", required = false) String authorization, @PathVariable String userid) {
 
         log.info("CvManagerProfileController::activateProfile user-id {}", userid);
         APIResponse apiResponse = cvUserProfileService.activateProfile(userid);
@@ -93,7 +93,7 @@ public class CvManagerProfileClientController {
 
     @Tag(name= "Profile activation")
     @PutMapping(USER_PROFILE + PARAM_USER_ID + DEACTIVATE)
-    public ResponseEntity<APIResponse> deactivateProfile(@RequestHeader(name = "Authorization", required = false) String Authorization, @PathVariable String userid) {
+    public ResponseEntity<APIResponse> deactivateProfile(@RequestHeader(name = "Authorization", required = false) String authorization, @PathVariable String userid) {
 
         log.info("CvManagerProfileController::deactivateProfile user-id {}", userid);
         APIResponse apiResponse = cvUserProfileService.deactivateProfile(userid);

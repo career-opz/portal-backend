@@ -19,7 +19,6 @@ import static dev.careeropz.portal.backend.cvmanager.service.CommonFunctions.par
 @Slf4j
 public class CvJobProfileService {
     private final RestClient restClient;
-    private final String currentUserId = "1";
 
     public CvJobProfileService(ApplicationProperties properties){
         restClient = RestClient.builder()
@@ -32,7 +31,7 @@ public class CvJobProfileService {
                 .build();
     }
 
-    public APIResponse getJobProfileById(String jobProfileId) {
+    public APIResponse getJobProfileById(String currentUserId, String jobProfileId) {
         try {
             log.info("getProfileById :: userid:{} :: ENTER", jobProfileId);
 
@@ -59,7 +58,7 @@ public class CvJobProfileService {
         }
     }
 
-    public APIResponse createJobProfile(String body, String currentUserId) {
+    public APIResponse createJobProfile(String currentUserId, String body) {
         try {
             log.info("createJobProfile :: userid:{} :: ENTER", currentUserId);
             JsonNode reqBody = parseJson(body);
@@ -88,7 +87,7 @@ public class CvJobProfileService {
         }
     }
 
-    public APIResponse updateJobProfileById(String jobProfileId, String body) {
+    public APIResponse updateJobProfileById(String currentUserId, String jobProfileId, String body) {
         try {
             log.info("updateJobProfileById :: jobProfileId:{} :: ENTER", jobProfileId);
             JsonNode reqBody = parseJson(body);
@@ -117,7 +116,7 @@ public class CvJobProfileService {
         }
     }
 
-    public APIResponse deleteJobProfileById(String jobProfileId) {
+    public APIResponse deleteJobProfileById(String currentUserId, String jobProfileId) {
         try {
             log.info("deleteJobProfileById :: jobProfileId:{} :: ENTER", jobProfileId);
 
@@ -144,7 +143,7 @@ public class CvJobProfileService {
         }
     }
 
-    public APIResponse getJobProfilesByUser() {
+    public APIResponse getJobProfilesByUser(String currentUserId) {
         try {
             log.info("getJobProfilesByUser :: userid:{} :: ENTER", currentUserId);
 
