@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import dev.careeropz.portal.backend.config.ApplicationProperties;
 import dev.careeropz.portal.backend.cvmanager.dto.APIResponse;
 import dev.careeropz.portal.backend.cvmanager.dto.ResponseEnum;
+import dev.careeropz.portal.backend.cvmanager.dto.pagination.CommonPaginationRequest;
 import dev.careeropz.portal.backend.cvmanager.exception.CvManagerServiceException;
 import dev.careeropz.portal.backend.util.UriBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -143,13 +144,19 @@ public class CvJobProfileService {
         }
     }
 
-    public APIResponse getJobProfilesByUser(String currentUserId) {
+    public APIResponse getJobProfilesByUser(String currentUserId, CommonPaginationRequest paginationRequest) {
         try {
             log.info("getJobProfilesByUser :: userid:{} :: ENTER", currentUserId);
 
             String response = restClient
                     .get()
-                    .uri(CV_MANAGER_JOB_PROFILE_BY_USER_ID, currentUserId)
+                    .uri(uriBuilder -> uriBuilder
+                            .path(CV_MANAGER_JOB_PROFILE_BY_USER_ID)
+                            .queryParam("page-no", paginationRequest.getPageNo())
+                            .queryParam("page-size", paginationRequest.getPageSize())
+                            .queryParam("sort-by", paginationRequest.getSortBy())
+                            .queryParam("sort-direction", paginationRequest.getSortDirection())
+                            .build(currentUserId))
                     .retrieve()
                     .body(String.class);
 

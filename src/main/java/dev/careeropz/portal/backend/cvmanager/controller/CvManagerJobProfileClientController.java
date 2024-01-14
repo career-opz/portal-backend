@@ -1,6 +1,7 @@
 package dev.careeropz.portal.backend.cvmanager.controller;
 
 import dev.careeropz.portal.backend.cvmanager.dto.APIResponse;
+import dev.careeropz.portal.backend.cvmanager.dto.pagination.CommonPaginationRequest;
 import dev.careeropz.portal.backend.cvmanager.service.CvJobProfileService;
 import dev.careeropz.portal.backend.util.JwtUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -71,10 +72,15 @@ public class CvManagerJobProfileClientController {
 
     @Tag(name= "Job Profile")
     @GetMapping()
-    public ResponseEntity<APIResponse> getJobProfilesByUser(@RequestHeader(name = "Authorization", required = false) String token) {
+    public ResponseEntity<APIResponse> getJobProfilesByUser(@RequestHeader(name = "Authorization", required = false) String token,
+                                                            @RequestParam(value = "page-no", defaultValue = "0") int pageNo,
+                                                            @RequestParam(value = "page-size", defaultValue = "10") int pageSize,
+                                                            @RequestParam(value = "sort-by", defaultValue = "id") String sortBy,
+                                                            @RequestParam(value = "sort-direction", defaultValue = "asc") String sortDirection) {
+        CommonPaginationRequest paginationRequest = new CommonPaginationRequest(pageNo, pageSize, sortBy, sortDirection);
         String currentUserId = JwtUtil.extractUserId(token);
         log.info("getJobProfilesByUser :: ENTER");
-        APIResponse apiResponse = cvJobProfileService.getJobProfilesByUser(currentUserId);
+        APIResponse apiResponse = cvJobProfileService.getJobProfilesByUser(currentUserId, paginationRequest);
         log.info("getJobProfilesByUser :: DONE");
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
 
