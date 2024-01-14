@@ -79,6 +79,39 @@ public class CvManagerProfileClientController {
 
     }
 
+    @Tag(name= "Personal Info", description = "Personal info related APIs")
+    @PutMapping(USER_PROFILE + PARAM_USER_ID + PERSONAL_INFO)
+    public ResponseEntity<APIResponse> updatePersonalInfo(@RequestHeader(name = "Authorization", required = false) String authorization, @PathVariable String userid, @RequestBody String body) {
+
+            log.info("CvManagerProfileController::updatePersonalInfo user-id {}", userid);
+            APIResponse apiResponse = cvUserProfileService.updatePersonalInfo(userid, body);
+            log.info("ProductController::updatePersonalInfo response {}", userid);
+
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @Tag(name= "Career Info", description = "Career info related APIs")
+    @PutMapping(USER_PROFILE + PARAM_USER_ID + CAREER_INFO)
+    public ResponseEntity<APIResponse> updateCareerInfo(@RequestHeader(name = "Authorization", required = false) String authorization, @PathVariable String userid, @RequestBody String body) {
+
+            log.info("CvManagerProfileController::updateCareerInfo user-id {}", userid);
+            APIResponse apiResponse = cvUserProfileService.updateCareerInfo(userid, body);
+            log.info("ProductController::updateCareerInfo response {}", userid);
+
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @Tag(name= "Social Links", description = "Social links related APIs")
+    @PutMapping(USER_PROFILE + PARAM_USER_ID + SOCIAL_LINKS)
+    public ResponseEntity<APIResponse> updateSocialLinks(@RequestHeader(name = "Authorization", required = false) String authorization, @PathVariable String userid, @RequestBody String body) {
+
+            log.info("CvManagerProfileController::updateSocialLinks user-id {}", userid);
+            APIResponse apiResponse = cvUserProfileService.updateSocialLinks(userid, body);
+            log.info("ProductController::updateSocialLinks response {}", userid);
+
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
     @Tag(name= "Profile activation", description = "Profile activation related APIs")
     @PutMapping(USER_PROFILE + PARAM_USER_ID + ACTIVATE)
     public ResponseEntity<APIResponse> activateProfile(@RequestHeader(name = "Authorization", required = false) String authorization, @PathVariable String userid) {
