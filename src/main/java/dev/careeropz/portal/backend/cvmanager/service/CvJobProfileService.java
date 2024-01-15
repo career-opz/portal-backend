@@ -117,6 +117,35 @@ public class CvJobProfileService {
         }
     }
 
+    public APIResponse updateJobProfileBasicInfo(String currentUserId, String jobProfileId, String body) {
+        try {
+            log.info("updateJobProfileBasicInfoById :: jobProfileId:{} :: ENTER", jobProfileId);
+            JsonNode reqBody = parseJson(body);
+
+            String response = restClient
+                    .put()
+                    .uri(CV_MANAGER_JOB_PROFILE_BY_USER_BY_JOB_PROFILE_ID + "/basic-info", currentUserId, jobProfileId)
+                    .body(reqBody)
+                    .retrieve()
+                    .body(String.class);
+
+            JsonNode jsonNode = parseJson(response);
+            log.info("updateJobProfileBasicInfoById :: jobProfileId:{} :: DONE", jobProfileId);
+            return APIResponse
+                    .builder()
+                    .status(ResponseEnum.SUCCESS)
+                    .result(jsonNode)
+                    .build();
+
+        } catch (RestClientResponseException restEx) {
+            log.error("updateJobProfileBasicInfoById :: jobProfileId:{} :: RestClientResponseException:{}", jobProfileId, restEx.getMessage());
+            throw new CvManagerServiceException("Status %s error occurred while fetching profile from cv manager server", getErrorApiResponse(restEx));
+        } catch (Exception ex) {
+            log.error("updateJobProfileBasicInfoById :: jobProfileId:{} :: Exception:{}", jobProfileId, ex.getMessage());
+            throw new CvManagerServiceException("Error occurred while fetch profile info from CvManagerService");
+        }
+    }
+
     public APIResponse deleteJobProfileById(String currentUserId, String jobProfileId) {
         try {
             log.info("deleteJobProfileById :: jobProfileId:{} :: ENTER", jobProfileId);

@@ -17,7 +17,7 @@ import static dev.careeropz.portal.backend.cvmanager.controller.CvManagetUrlCons
 @RequestMapping(CV_MANAGER_PROFILE)
 @Slf4j
 @RequiredArgsConstructor
-public class CvManagerProfileClientController {
+public class CvManagerUserProfileClientController {
     private final CvUserProfileService cvUserProfileService;
 
     @Tag(name= "User Profile", description = "User profile related APIs")

@@ -10,10 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Optional;
-
 @RestControllerAdvice
-public class CvManagerProfileClientControllerAdvice {
+public class CvManagerControllerAdvice {
 
     @ExceptionHandler(CvManagerServiceException.class)
     ResponseEntity<APIResponse> cvManagerServiceException(CvManagerServiceException ex){
