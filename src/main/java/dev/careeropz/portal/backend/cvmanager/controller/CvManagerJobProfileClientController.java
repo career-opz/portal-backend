@@ -81,7 +81,7 @@ public class CvManagerJobProfileClientController {
     @Tag(name= "Job Profile")
     @GetMapping()
     public ResponseEntity<APIResponse> getJobProfilesByUser(@RequestHeader(name = "Authorization", required = false) String token,
-                                                            @RequestParam(value = "page-no", defaultValue = "0") int pageNo,
+                                                            @RequestParam(value = "page-no", defaultValue = "1") int pageNo,
                                                             @RequestParam(value = "page-size", defaultValue = "10") int pageSize,
                                                             @RequestParam(value = "sort-by", defaultValue = "id") String sortBy,
                                                             @RequestParam(value = "sort-direction", defaultValue = "asc") String sortDirection) {
