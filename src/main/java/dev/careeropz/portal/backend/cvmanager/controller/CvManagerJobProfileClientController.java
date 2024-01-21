@@ -7,6 +7,7 @@ import dev.careeropz.portal.backend.util.JwtUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -90,6 +91,40 @@ public class CvManagerJobProfileClientController {
         log.info("getJobProfilesByUser :: ENTER");
         APIResponse apiResponse = cvJobProfileService.getJobProfilesByUser(currentUserId, paginationRequest);
         log.info("getJobProfilesByUser :: DONE");
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @Tag(name= "Job Profile/suggestions")
+    @GetMapping("/suggestions")
+    public ResponseEntity<APIResponse> getJobProfileSuggestions(@RequestHeader(name = "Authorization", required = false) String token){
+        String currentUserId = JwtUtil.extractUserId(token);
+        log.info("getJobProfileSuggestions :: ENTER");
+        APIResponse apiResponse = cvJobProfileService.getJobProfileSuggestions(currentUserId);
+        log.info("getJobProfileSuggestions :: DONE");
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    // post suggestions
+    @Tag(name= "Job Profile/suggestions")
+    @PostMapping("/suggestions")
+    public ResponseEntity<APIResponse> postJobProfileSuggestions(@RequestHeader(name = "Authorization", required = false) String token,
+                                                                 @RequestBody String body){
+        String currentUserId = JwtUtil.extractUserId(token);
+        log.info("postJobProfileSuggestions :: ENTER");
+        APIResponse apiResponse = cvJobProfileService.postJobProfileSuggestions(currentUserId, body);
+        log.info("postJobProfileSuggestions :: DONE");
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    // delete suggestions
+    @Tag(name= "Job Profile/suggestions")
+    @DeleteMapping("/suggestions/{suggestion-id}")
+    public ResponseEntity<APIResponse> deleteJobProfileSuggestions(@RequestHeader(name = "Authorization", required = false) String token,
+                                                                   @PathVariable(name = "suggestion-id") String suggestionId){
+        String currentUserId = JwtUtil.extractUserId(token);
+        log.info("deleteJobProfileSuggestions :: ENTER");
+        APIResponse apiResponse = cvJobProfileService.deleteJobProfileSuggestions(currentUserId, suggestionId);
+        log.info("deleteJobProfileSuggestions :: DONE");
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 }

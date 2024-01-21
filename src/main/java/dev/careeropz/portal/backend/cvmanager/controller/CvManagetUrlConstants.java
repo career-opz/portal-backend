@@ -25,7 +25,10 @@ public class CvManagetUrlConstants {
     // Job Profile related constants
     public static final String JOB_PROFILE = "/job-profile";
     public static final String PARAM_JOB_PROFILE_ID = "/{job-profile-id}";
+    public static final String PARAM_SUGGESTION_ID = "/{suggestion-id}";
     public static final String CV_MANAGER_JOB_PROFILE_BY_USER_ID = CV_MANAGER_API + JOB_PROFILE + USER + PARAM_USER_ID;
     public static final String CV_MANAGER_JOB_PROFILE_BY_USER_BY_JOB_PROFILE_ID = CV_MANAGER_JOB_PROFILE_BY_USER_ID + PARAM_JOB_PROFILE_ID;
+    public static final String CV_MANAGER_JOB_PROFILE_SUGGESTIONS_BY_USER_ID = CV_MANAGER_API + JOB_PROFILE + "/suggestions" + PARAM_USER_ID;
+    public static final String CV_MANAGER_JOB_PROFILE_SUGGESTIONS_BY_USER_BY_SUGGESTION_ID = CV_MANAGER_JOB_PROFILE_SUGGESTIONS_BY_USER_ID + PARAM_SUGGESTION_ID;
 
 }

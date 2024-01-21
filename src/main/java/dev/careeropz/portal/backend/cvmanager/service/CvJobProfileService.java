@@ -205,4 +205,87 @@ public class CvJobProfileService {
             throw new CvManagerServiceException("Error occurred while fetch profile info from CvManagerService");
         }
     }
+
+    public APIResponse getJobProfileSuggestions(String currentUserId) {
+        try {
+            log.info("getJobProfileSuggestions :: userid:{} :: ENTER", currentUserId);
+
+            String response = restClient
+                    .get()
+                    .uri(CV_MANAGER_JOB_PROFILE_SUGGESTIONS_BY_USER_ID, currentUserId)
+                    .retrieve()
+                    .body(String.class);
+
+            JsonNode jsonNode = parseJson(response);
+            log.info("getJobProfileSuggestions :: userid:{} :: DONE", currentUserId);
+            return APIResponse
+                    .builder()
+                    .status(ResponseEnum.SUCCESS)
+                    .result(jsonNode)
+                    .build();
+
+        } catch (RestClientResponseException restEx) {
+            log.error("getJobProfileSuggestions :: userid:{} :: RestClientResponseException:{}", currentUserId, restEx.getMessage());
+            throw new CvManagerServiceException("Status %s error occurred while fetching profile from cv manager server", getErrorApiResponse(restEx));
+        } catch (Exception ex) {
+            log.error("getJobProfileSuggestions :: userid:{} :: Exception:{}", currentUserId, ex.getMessage());
+            throw new CvManagerServiceException("Error occurred while fetch profile info from CvManagerService");
+        }
+    }
+
+    public APIResponse postJobProfileSuggestions(String currentUserId, String body) {
+        try {
+            log.info("postJobProfileSuggestions :: userid:{} :: ENTER", currentUserId);
+            JsonNode reqBody = parseJson(body);
+
+            String response = restClient
+                    .post()
+                    .uri(CV_MANAGER_JOB_PROFILE_SUGGESTIONS_BY_USER_ID, currentUserId)
+                    .body(reqBody)
+                    .retrieve()
+                    .body(String.class);
+
+            JsonNode jsonNode = parseJson(response);
+            log.info("postJobProfileSuggestions :: userid:{} :: DONE", currentUserId);
+            return APIResponse
+                    .builder()
+                    .status(ResponseEnum.SUCCESS)
+                    .result(jsonNode)
+                    .build();
+
+        } catch (RestClientResponseException restEx) {
+            log.error("postJobProfileSuggestions :: userid:{} :: RestClientResponseException:{}", currentUserId, restEx.getMessage());
+            throw new CvManagerServiceException("Status %s error occurred while fetching profile from cv manager server", getErrorApiResponse(restEx));
+        } catch (Exception ex) {
+            log.error("postJobProfileSuggestions :: userid:{} :: Exception:{}", currentUserId, ex.getMessage());
+            throw new CvManagerServiceException("Error occurred while fetch profile info from CvManagerService");
+        }
+    }
+
+    public APIResponse deleteJobProfileSuggestions(String currentUserId, String suggestionId) {
+        try {
+            log.info("deleteJobProfileSuggestions :: userid:{} :: ENTER", currentUserId);
+
+            String response = restClient
+                    .delete()
+                    .uri(CV_MANAGER_JOB_PROFILE_SUGGESTIONS_BY_USER_BY_SUGGESTION_ID, currentUserId, suggestionId)
+                    .retrieve()
+                    .body(String.class);
+
+            JsonNode jsonNode = parseJson(response);
+            log.info("deleteJobProfileSuggestions :: userid:{} :: DONE", currentUserId);
+            return APIResponse
+                    .builder()
+                    .status(ResponseEnum.SUCCESS)
+                    .result(jsonNode)
+                    .build();
+
+        } catch (RestClientResponseException restEx) {
+            log.error("deleteJobProfileSuggestions :: userid:{} :: RestClientResponseException:{}", currentUserId, restEx.getMessage());
+            throw new CvManagerServiceException("Status %s error occurred while fetching profile from cv manager server", getErrorApiResponse(restEx));
+        } catch (Exception ex) {
+            log.error("deleteJobProfileSuggestions :: userid:{} :: Exception:{}", currentUserId, ex.getMessage());
+            throw new CvManagerServiceException("Error occurred while fetch profile info from CvManagerService");
+        }
+    }
 }
