@@ -11,6 +11,9 @@ import org.springframework.web.client.RestClientResponseException;
 import java.util.List;
 
 public class CommonFunctions {
+
+    private CommonFunctions() {throw new IllegalStateException("Utility class");}
+
     public static APIResponse getErrorApiResponse(RestClientResponseException restEx) {
         return APIResponse
                 .builder()

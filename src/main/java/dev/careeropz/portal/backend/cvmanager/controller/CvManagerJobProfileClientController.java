@@ -7,10 +7,12 @@ import dev.careeropz.portal.backend.util.JwtUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 import static dev.careeropz.portal.backend.cvmanager.controller.CvManagetUrlConstants.*;
 
@@ -21,7 +23,7 @@ import static dev.careeropz.portal.backend.cvmanager.controller.CvManagetUrlCons
 public class CvManagerJobProfileClientController {
     private final CvJobProfileService cvJobProfileService;
 
-    @Tag(name= "Job Profile", description = "Job profile related APIs")
+    @Tag(name = "Job Profile", description = "Job profile related APIs")
     @GetMapping(PARAM_JOB_PROFILE_ID)
     public ResponseEntity<APIResponse> getJobProfileById(@RequestHeader(name = "Authorization", required = false) String token,
                                                          @PathVariable(name = "job-profile-id") String jobProfileId) {
@@ -33,7 +35,7 @@ public class CvManagerJobProfileClientController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Tag(name= "Job Profile")
+    @Tag(name = "Job Profile")
     @PostMapping()
     public ResponseEntity<APIResponse> createJobProfile(@RequestHeader(name = "Authorization", required = false) String token,
                                                         @RequestBody String body) {
@@ -44,7 +46,7 @@ public class CvManagerJobProfileClientController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    @Tag(name= "Job Profile")
+    @Tag(name = "Job Profile")
     @PutMapping(PARAM_JOB_PROFILE_ID)
     public ResponseEntity<APIResponse> updateJobProfile(@RequestHeader(name = "Authorization", required = false) String token,
                                                         @PathVariable(name = "job-profile-id") String jobProfileId,
@@ -56,7 +58,7 @@ public class CvManagerJobProfileClientController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    @Tag(name= "Job Profile/Basic Info")
+    @Tag(name = "Job Profile/Basic Info")
     @PutMapping("/{job-profile-id}/basic-info")
     public ResponseEntity<APIResponse> updateJobProfileBasicInfo(@RequestHeader(name = "Authorization", required = false) String token,
                                                                  @PathVariable(name = "job-profile-id") String jobProfileId,
@@ -68,7 +70,51 @@ public class CvManagerJobProfileClientController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    @Tag(name= "Job Profile")
+    @Tag(name = "Job Profile/Progress")
+    @PostMapping("/{job-profile-id}/progress")
+    public ResponseEntity<APIResponse> createJobProfileProgressStep(@RequestHeader(name = "Authorization", required = false) String token,
+                                                                    @PathVariable(name = "job-profile-id") String jobProfileId,
+                                                                    @RequestParam("cv") MultipartFile cv,
+                                                                    @RequestParam("cover-letter") MultipartFile coverLetter,
+                                                                    @RequestParam("other-docs") List<MultipartFile> otherDocs,
+                                                                    @RequestParam("data") String data) {
+        String currentUserId = JwtUtil.extractUserId(token);
+        log.info("createJobProfileProgress :: job-profile-id:{} :: ENTER", jobProfileId);
+        APIResponse apiResponse = cvJobProfileService.createJobProfileProgressStep(
+                currentUserId,
+                jobProfileId,
+                cv,
+                coverLetter,
+                otherDocs,
+                data);
+        log.info("createJobProfileProgress :: job-profile-id:{} :: DONE", jobProfileId);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @Tag(name = "Job Profile/Progress")
+    @PutMapping("/{job-profile-id}/progress/{progress-id}")
+    public ResponseEntity<APIResponse> updateJobProfileProgress(@RequestHeader(name = "Authorization", required = false) String token,
+                                                                @PathVariable(name = "job-profile-id") String jobProfileId,
+                                                                @PathVariable(name = "progress-id") String progressId,
+                                                                @RequestParam("cv") MultipartFile cv,
+                                                                @RequestParam("cover-letter") MultipartFile coverLetter,
+                                                                @RequestParam("other-docs") List<MultipartFile> otherDocs,
+                                                                @RequestParam("data") String data) {
+        String currentUserId = JwtUtil.extractUserId(token);
+        log.info("updateJobProfileProgress :: job-profile-id:{} :: ENTER", jobProfileId);
+        APIResponse apiResponse = cvJobProfileService.updateJobProfileProgress(
+                currentUserId,
+                jobProfileId,
+                progressId,
+                cv,
+                coverLetter,
+                otherDocs,
+                data);
+        log.info("updateJobProfileProgress :: job-profile-id:{} :: DONE", jobProfileId);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @Tag(name = "Job Profile")
     @DeleteMapping(PARAM_JOB_PROFILE_ID)
     public ResponseEntity<APIResponse> deleteJobProfile(@RequestHeader(name = "Authorization", required = false) String token,
                                                         @PathVariable(name = "job-profile-id") String jobProfileId) {
@@ -79,7 +125,7 @@ public class CvManagerJobProfileClientController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    @Tag(name= "Job Profile")
+    @Tag(name = "Job Profile")
     @GetMapping()
     public ResponseEntity<APIResponse> getJobProfilesByUser(@RequestHeader(name = "Authorization", required = false) String token,
                                                             @RequestParam(value = "page-no", defaultValue = "1") int pageNo,
@@ -94,9 +140,9 @@ public class CvManagerJobProfileClientController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    @Tag(name= "Job Profile/suggestions")
+    @Tag(name = "Job Profile/suggestions")
     @GetMapping("/suggestions")
-    public ResponseEntity<APIResponse> getJobProfileSuggestions(@RequestHeader(name = "Authorization", required = false) String token){
+    public ResponseEntity<APIResponse> getJobProfileSuggestions(@RequestHeader(name = "Authorization", required = false) String token) {
         String currentUserId = JwtUtil.extractUserId(token);
         log.info("getJobProfileSuggestions :: ENTER");
         APIResponse apiResponse = cvJobProfileService.getJobProfileSuggestions(currentUserId);
@@ -105,10 +151,10 @@ public class CvManagerJobProfileClientController {
     }
 
     // post suggestions
-    @Tag(name= "Job Profile/suggestions")
+    @Tag(name = "Job Profile/suggestions")
     @PostMapping("/suggestions")
     public ResponseEntity<APIResponse> postJobProfileSuggestions(@RequestHeader(name = "Authorization", required = false) String token,
-                                                                 @RequestBody String body){
+                                                                 @RequestBody String body) {
         String currentUserId = JwtUtil.extractUserId(token);
         log.info("postJobProfileSuggestions :: ENTER");
         APIResponse apiResponse = cvJobProfileService.postJobProfileSuggestions(currentUserId, body);
@@ -117,10 +163,10 @@ public class CvManagerJobProfileClientController {
     }
 
     // delete suggestions
-    @Tag(name= "Job Profile/suggestions")
+    @Tag(name = "Job Profile/suggestions")
     @DeleteMapping("/suggestions/{suggestion-id}")
     public ResponseEntity<APIResponse> deleteJobProfileSuggestions(@RequestHeader(name = "Authorization", required = false) String token,
-                                                                   @PathVariable(name = "suggestion-id") String suggestionId){
+                                                                   @PathVariable(name = "suggestion-id") String suggestionId) {
         String currentUserId = JwtUtil.extractUserId(token);
         log.info("deleteJobProfileSuggestions :: ENTER");
         APIResponse apiResponse = cvJobProfileService.deleteJobProfileSuggestions(currentUserId, suggestionId);

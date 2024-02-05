@@ -8,4 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
     String cvManagerHost;
     Integer cvManagerPort;
+
+    String fileServerHost;
+    Integer fileServerPort;
 }

@@ -1,6 +1,13 @@
 package dev.careeropz.portal.backend.cvmanager.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.careeropz.commons.dto.FileDataDto;
+import dev.careeropz.commons.fileservice.dto.FileType;
+import dev.careeropz.commons.fileservice.dto.responseto.FileUploadResponseDto;
+import dev.careeropz.commons.jobprofile.commondto.JobProfileProgressStepDto;
+import dev.careeropz.commons.jobprofile.commondto.ProgressUploadsDto;
 import dev.careeropz.portal.backend.config.ApplicationProperties;
 import dev.careeropz.portal.backend.cvmanager.dto.APIResponse;
 import dev.careeropz.portal.backend.cvmanager.dto.ResponseEnum;
@@ -11,6 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 import static dev.careeropz.portal.backend.cvmanager.controller.CvManagetUrlConstants.*;
 import static dev.careeropz.portal.backend.cvmanager.service.CommonFunctions.getErrorApiResponse;
@@ -20,8 +30,9 @@ import static dev.careeropz.portal.backend.cvmanager.service.CommonFunctions.par
 @Slf4j
 public class CvJobProfileService {
     private final RestClient restClient;
+    private final FileManagerService fileManagerService;
 
-    public CvJobProfileService(ApplicationProperties properties){
+    public CvJobProfileService(ApplicationProperties properties, FileManagerService fileManagerService){
         restClient = RestClient.builder()
                 .baseUrl(UriBuilder
                         .builder()
@@ -30,6 +41,8 @@ public class CvJobProfileService {
                         .build()
                         .buildHttpUrl())
                 .build();
+
+        this.fileManagerService = fileManagerService;
     }
 
     public APIResponse getJobProfileById(String currentUserId, String jobProfileId) {
@@ -143,6 +156,104 @@ public class CvJobProfileService {
         } catch (Exception ex) {
             log.error("updateJobProfileBasicInfoById :: jobProfileId:{} :: Exception:{}", jobProfileId, ex.getMessage());
             throw new CvManagerServiceException("Error occurred while fetch profile info from CvManagerService");
+        }
+    }
+
+    public APIResponse createJobProfileProgressStep(String currentUserId,
+                                                    String jobProfileId,
+                                                    MultipartFile cv,
+                                                    MultipartFile coverLetter,
+                                                    List<MultipartFile> otherDocs,
+                                                    String data){
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JobProfileProgressStepDto progressStepDto = objectMapper.readValue(data, JobProfileProgressStepDto.class);
+            progressStepDto.setUploads(ProgressUploadsDto.builder().build());
+            fillProgressUploads(currentUserId, cv, coverLetter, otherDocs, progressStepDto);
+
+            String response = restClient
+                    .post()
+                    .uri(CV_MANAGER_JOB_PROFILE_BY_USER_BY_JOB_PROFILE_ID + "/progress-step", currentUserId, jobProfileId)
+                    .body(progressStepDto)
+                    .retrieve()
+                    .body(String.class);
+
+            JsonNode jsonNode = parseJson(response);
+            log.info("createJobProfileProgress :: jobProfileId:{} :: DONE", jobProfileId);
+            return APIResponse
+                    .builder()
+                    .status(ResponseEnum.SUCCESS)
+                    .result(jsonNode)
+                    .build();
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public APIResponse updateJobProfileProgress(String currentUserId,
+                                               String jobProfileId,
+                                               String progressId,
+                                               MultipartFile cv,
+                                               MultipartFile coverLetter,
+                                               List<MultipartFile> otherDocs,
+                                               String data){
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JobProfileProgressStepDto progressStepDto = objectMapper.readValue(data, JobProfileProgressStepDto.class);
+            if(progressStepDto.getUploads() != null){
+                progressStepDto.setUploads(ProgressUploadsDto.builder().build());
+            }
+            fillProgressUploads(currentUserId, cv, coverLetter, otherDocs, progressStepDto);
+
+            String response = restClient
+                    .put()
+                    .uri(CV_MANAGER_JOB_PROFILE_BY_USER_BY_JOB_PROFILE_ID + "/progress/{progress-id}", currentUserId, jobProfileId, progressId)
+                    .body(progressStepDto)
+                    .retrieve()
+                    .body(String.class);
+
+            JsonNode jsonNode = parseJson(response);
+            log.info("updateJobProfileProgress :: jobProfileId:{} :: DONE", jobProfileId);
+            return APIResponse
+                    .builder()
+                    .status(ResponseEnum.SUCCESS)
+                    .result(jsonNode)
+                    .build();
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void fillProgressUploads(String currentUserId, MultipartFile cv, MultipartFile coverLetter, List<MultipartFile> otherDocs, JobProfileProgressStepDto progressStepDto) {
+        if(cv != null){
+            FileUploadResponseDto fileUploadResponseDto = fileManagerService.uploadFile(cv, FileType.CV, currentUserId);
+            progressStepDto.getUploads().setCv(FileDataDto.builder()
+                            .name(fileUploadResponseDto.getFileName())
+                            .fileId(fileUploadResponseDto.getFileId())
+                            .dateUploaded(fileUploadResponseDto.getUploadedOn().toLocalDate())
+                    .build());
+        }
+        if(coverLetter != null){
+            FileUploadResponseDto fileUploadResponseDto = fileManagerService.uploadFile(coverLetter, FileType.COVER_LETTER, currentUserId);
+            progressStepDto.getUploads().setCoverLetter(FileDataDto.builder()
+                            .name(fileUploadResponseDto.getFileName())
+                            .fileId(fileUploadResponseDto.getFileId())
+                            .dateUploaded(fileUploadResponseDto.getUploadedOn().toLocalDate())
+                    .build());
+        }
+        if(otherDocs != null){
+            for(MultipartFile file: otherDocs){
+                FileUploadResponseDto fileUploadResponseDto = fileManagerService.uploadFile(file, FileType.OTHER, currentUserId);
+                progressStepDto.getUploads().getOther().add(FileDataDto.builder()
+                        .name(fileUploadResponseDto.getFileName())
+                        .fileId(fileUploadResponseDto.getFileId())
+                        .dateUploaded(fileUploadResponseDto.getUploadedOn().toLocalDate())
+                        .build());
+            }
         }
     }
 
