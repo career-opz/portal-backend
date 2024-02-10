@@ -1,6 +1,8 @@
 services:
   cv-manager-host: localhost
-  cv-manager-port: 9091
+  cv-manager-port: 9092
+  file-server-host: localhost
+  file-server-port: 9093
 
 
 server:

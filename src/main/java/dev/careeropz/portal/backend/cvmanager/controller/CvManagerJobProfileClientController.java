@@ -71,7 +71,7 @@ public class CvManagerJobProfileClientController {
     }
 
     @Tag(name = "Job Profile/Progress")
-    @PostMapping("/{job-profile-id}/progress")
+    @PostMapping("/{job-profile-id}/progress-step")
     public ResponseEntity<APIResponse> createJobProfileProgressStep(@RequestHeader(name = "Authorization", required = false) String token,
                                                                     @PathVariable(name = "job-profile-id") String jobProfileId,
                                                                     @RequestParam("cv") MultipartFile cv,
@@ -92,7 +92,7 @@ public class CvManagerJobProfileClientController {
     }
 
     @Tag(name = "Job Profile/Progress")
-    @PutMapping("/{job-profile-id}/progress/{progress-id}")
+    @PutMapping("/{job-profile-id}/progress-step/{progress-id}")
     public ResponseEntity<APIResponse> updateJobProfileProgress(@RequestHeader(name = "Authorization", required = false) String token,
                                                                 @PathVariable(name = "job-profile-id") String jobProfileId,
                                                                 @PathVariable(name = "progress-id") String progressId,

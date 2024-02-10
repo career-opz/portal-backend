@@ -20,6 +20,8 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static dev.careeropz.portal.backend.cvmanager.controller.CvManagetUrlConstants.*;
@@ -32,7 +34,7 @@ public class CvJobProfileService {
     private final RestClient restClient;
     private final FileManagerService fileManagerService;
 
-    public CvJobProfileService(ApplicationProperties properties, FileManagerService fileManagerService){
+    public CvJobProfileService(ApplicationProperties properties, FileManagerService fileManagerService) {
         restClient = RestClient.builder()
                 .baseUrl(UriBuilder
                         .builder()
@@ -164,12 +166,13 @@ public class CvJobProfileService {
                                                     MultipartFile cv,
                                                     MultipartFile coverLetter,
                                                     List<MultipartFile> otherDocs,
-                                                    String data){
+                                                    String data) {
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
+            log.info("createJobProfileProgress :: jobProfileId:{} :: ENTER", jobProfileId);
             JobProfileProgressStepDto progressStepDto = objectMapper.readValue(data, JobProfileProgressStepDto.class);
-            progressStepDto.setUploads(ProgressUploadsDto.builder().build());
+            progressStepDto.setUploads(ProgressUploadsDto.builder().other(new ArrayList<>()).build());
             fillProgressUploads(currentUserId, cv, coverLetter, otherDocs, progressStepDto);
 
             String response = restClient
@@ -193,24 +196,21 @@ public class CvJobProfileService {
     }
 
     public APIResponse updateJobProfileProgress(String currentUserId,
-                                               String jobProfileId,
-                                               String progressId,
-                                               MultipartFile cv,
-                                               MultipartFile coverLetter,
-                                               List<MultipartFile> otherDocs,
-                                               String data){
+                                                String jobProfileId,
+                                                String progressId,
+                                                MultipartFile cv,
+                                                MultipartFile coverLetter,
+                                                List<MultipartFile> otherDocs,
+                                                String data) {
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             JobProfileProgressStepDto progressStepDto = objectMapper.readValue(data, JobProfileProgressStepDto.class);
-            if(progressStepDto.getUploads() != null){
-                progressStepDto.setUploads(ProgressUploadsDto.builder().build());
-            }
             fillProgressUploads(currentUserId, cv, coverLetter, otherDocs, progressStepDto);
 
             String response = restClient
                     .put()
-                    .uri(CV_MANAGER_JOB_PROFILE_BY_USER_BY_JOB_PROFILE_ID + "/progress/{progress-id}", currentUserId, jobProfileId, progressId)
+                    .uri(CV_MANAGER_JOB_PROFILE_BY_USER_BY_JOB_PROFILE_ID + "/progress-step/{progress-id}", currentUserId, jobProfileId, progressId)
                     .body(progressStepDto)
                     .retrieve()
                     .body(String.class);
@@ -229,29 +229,29 @@ public class CvJobProfileService {
     }
 
     private void fillProgressUploads(String currentUserId, MultipartFile cv, MultipartFile coverLetter, List<MultipartFile> otherDocs, JobProfileProgressStepDto progressStepDto) {
-        if(cv != null){
+        if (cv != null && !cv.isEmpty()) {
             FileUploadResponseDto fileUploadResponseDto = fileManagerService.uploadFile(cv, FileType.CV, currentUserId);
             progressStepDto.getUploads().setCv(FileDataDto.builder()
-                            .name(fileUploadResponseDto.getFileName())
-                            .fileId(fileUploadResponseDto.getFileId())
-                            .dateUploaded(fileUploadResponseDto.getUploadedOn().toLocalDate())
+                    .name(fileUploadResponseDto.getFileName())
+                    .fileId(fileUploadResponseDto.getFileId())
+                    .dateUploaded(fileUploadResponseDto.getUploadedOn())
                     .build());
         }
-        if(coverLetter != null){
+        if (coverLetter != null && !coverLetter.isEmpty()) {
             FileUploadResponseDto fileUploadResponseDto = fileManagerService.uploadFile(coverLetter, FileType.COVER_LETTER, currentUserId);
             progressStepDto.getUploads().setCoverLetter(FileDataDto.builder()
-                            .name(fileUploadResponseDto.getFileName())
-                            .fileId(fileUploadResponseDto.getFileId())
-                            .dateUploaded(fileUploadResponseDto.getUploadedOn().toLocalDate())
+                    .name(fileUploadResponseDto.getFileName())
+                    .fileId(fileUploadResponseDto.getFileId())
+                    .dateUploaded(fileUploadResponseDto.getUploadedOn())
                     .build());
         }
-        if(otherDocs != null){
-            for(MultipartFile file: otherDocs){
+        if (otherDocs != null && !otherDocs.isEmpty() && !(otherDocs.get(0).isEmpty())) {
+            for (MultipartFile file : otherDocs) {
                 FileUploadResponseDto fileUploadResponseDto = fileManagerService.uploadFile(file, FileType.OTHER, currentUserId);
                 progressStepDto.getUploads().getOther().add(FileDataDto.builder()
                         .name(fileUploadResponseDto.getFileName())
                         .fileId(fileUploadResponseDto.getFileId())
-                        .dateUploaded(fileUploadResponseDto.getUploadedOn().toLocalDate())
+                        .dateUploaded(fileUploadResponseDto.getUploadedOn())
                         .build());
             }
         }
