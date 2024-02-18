@@ -7,3 +7,16 @@ services:
 
 server:
   port: 9091
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:7070/realms/cv-manager
+
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: portal-be
+      client-secret: eaXaW0Cl3fpvtWhy3fapCf8KdNoPBYl5
