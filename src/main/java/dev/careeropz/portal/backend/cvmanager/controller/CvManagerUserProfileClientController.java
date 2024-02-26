@@ -139,9 +139,17 @@ public class CvManagerUserProfileClientController {
         log.info("CvManagerProfileController::deactivateProfile user-id {}", userid);
         APIResponse apiResponse = cvUserProfileService.deactivateProfile(userid);
         log.info("ProductController::deactivateProfile response {}", userid);
-
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-
     }
 
+
+    @Tag(name= "Check profile availability")
+    @GetMapping(CHECK)
+    public ResponseEntity<APIResponse> checkProfileAvailability(@RequestHeader(name="Authorization", required = false) String token){
+        String currentUserId = JwtUtil.extractUserId(token);
+        log.info("CvManagerProfileController::checkProfileAvailability user-id {}", currentUserId);
+        APIResponse apiResponse = cvUserProfileService.checkProfileAvailability(currentUserId, token);
+        log.info("ProductController::checkProfileAvailability response {}", currentUserId);
+        return new ResponseEntity<>(apiResponse, apiResponse.getStatusCode());
+    }
 }

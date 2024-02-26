@@ -1,15 +1,20 @@
 package dev.careeropz.portal.backend.cvmanager.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import dev.careeropz.commons.userinfo.UserProfileCheckRequestDto;
 import dev.careeropz.portal.backend.config.ApplicationProperties;
 import dev.careeropz.portal.backend.cvmanager.dto.APIResponse;
 import dev.careeropz.portal.backend.cvmanager.dto.ResponseEnum;
 import dev.careeropz.portal.backend.cvmanager.exception.CvManagerServiceException;
 import dev.careeropz.portal.backend.util.UriBuilder;
+import io.swagger.v3.core.util.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+
+import java.util.Base64;
 
 import static dev.careeropz.portal.backend.cvmanager.controller.CvManagetUrlConstants.*;
 import static dev.careeropz.portal.backend.cvmanager.service.CommonFunctions.getErrorApiResponse;
@@ -307,4 +312,50 @@ public class CvUserProfileService {
             throw new CvManagerServiceException("Exception occurred while deactivating profile info in CvManagerService");
         }
     }
+
+    public APIResponse checkProfileAvailability(String userid, String token){
+        try {
+            log.info("CvManagerProfileAPIService:checkProfileAvailability execution started.");
+            JsonNode jwtPayload = extractPayloadFromJwt(token);
+            String email = jwtPayload.get("email").asText();
+            String firstName = jwtPayload.get("given_name").asText();
+            String lastName = jwtPayload.get("family_name").asText();
+
+            RestClient.ResponseSpec response = restClient
+                    .post()
+                    .uri(CV_MANAGER_PROFILE_BY_ID_CHECK, userid)
+                    .body(UserProfileCheckRequestDto.builder()
+                            .userId(userid)
+                            .email(email)
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .build())
+                    .retrieve();
+
+            log.info("ProductService:checkProfileAvailability execution ended.");
+            return APIResponse
+                    .builder()
+                    .statusCode(response.toBodilessEntity().getStatusCode())
+                    .status(ResponseEnum.SUCCESS)
+                    .build();
+        } catch (RestClientResponseException ex) {
+            log.error("Exception occurred while checking profile availability {} from CvManagerService, Exception message {}", userid, ex.getMessage());
+            throw new CvManagerServiceException("Status %s error occurred while checking profile availability in CvManagerService", getErrorApiResponse(ex));
+        } catch (Exception ex) {
+            log.error("Exception occurred while checking profile availability {} from CvManagerService, Exception message {}", userid, ex.getMessage());
+            throw new CvManagerServiceException("Exception occurred while checking profile availability in CvManagerService");
+        }
+    }
+
+    private JsonNode extractPayloadFromJwt(String jwt){
+        // split the jwt from "." and decode the second part of the jwt
+        String[] jwtParts = jwt.split("\\.");
+        String jwtPayload = new String(Base64.getDecoder().decode(jwtParts[1]));
+        try {
+            return parseJson(jwtPayload);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
