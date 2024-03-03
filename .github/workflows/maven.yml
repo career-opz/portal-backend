@@ -13,11 +13,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+
+    - name: Clone and install dependencies for commons project
+      run: |
+        git clone https://github.com/career-opz/commons.git
+        cd commons
+        git config --local credential.helper store <<< "username=$(git config --get user.email) password=${{ secrets.REPO_ACCESS_TOKEN }}"
+        mvn clean install
+
     - name: Build with Maven
       run: mvn clean install
