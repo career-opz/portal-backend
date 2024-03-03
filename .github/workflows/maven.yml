@@ -21,11 +21,16 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Clone and install dependencies for commons project
+    - name: Clone Github Repo Action
+      uses: GuillaumeFalourd/clone-github-repo-action@v2.3
+      with:
+        owner: 'career-opz'
+        repository: 'commons'
+        access-token: ${{ secrets.REPO_ACCESS_TOKEN }}
+            
+    - name: Access cloned repository content
       run: |
-        git clone https://github.com/career-opz/commons.git
         cd commons
-        git config --local credential.helper store <<< "username=$(git config --get user.email) password=${{ secrets.REPO_ACCESS_TOKEN }}"
         mvn clean install
 
     - name: Build with Maven
