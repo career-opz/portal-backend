@@ -26,5 +26,6 @@ Otherwise you can use intellij to run the portal backend
 [swager-docs](http://localhost:9091/swagger-ui/index.html)
 ### High level Architecture diagram
 ![Highlevel Architecture](https://github.com/career-opz/portal-backend/blob/main/docs/images/archi.png?raw=true)
+![Social Login Design](https://github.com/career-opz/portal-backend/blob/main/docs/images/social_login.png?raw=true)
 
     
