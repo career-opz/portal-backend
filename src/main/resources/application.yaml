@@ -18,5 +18,5 @@ spring:
 springdoc:
   swagger-ui:
     oauth:
-      client-id: portal-be
-      client-secret: eaXaW0Cl3fpvtWhy3fapCf8KdNoPBYl5
+      client-id: ${CLIENT_ID}
+      client-secret: ${CLIENT_SECRET}
