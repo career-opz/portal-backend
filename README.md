@@ -22,7 +22,9 @@ To install the project if you want
 
 Otherwise you can use intellij to run the portal backend
 ## Documentation
-
+### Swagger
 [swager-docs](http://localhost:9091/swagger-ui/index.html)
+### High level Architecture diagram
+![Image Description](image_url)
 
     
